@@ -1,0 +1,61 @@
+!pip install langchain_openai
+
+from langchain_openai import ChatOpenAI
+llama3 = ChatOpenAI (api_key = groq_key,
+                     base_url = "https://api.groq.com/openai/v1",
+                     model = "meta-llama/llama-4-scout-17b-16e-instruct",
+                    )
+
+!pip install typing
+!pip install langchain
+!pip install langchain_core
+!pip install pydantic
+
+from typing import Optional, List
+from pydantic import BaseModel, Field
+
+class Market_Resarch (BaseModel) :
+  
+
+class Person (BaseModel) :
+  name: str = Field (description = "Name of the Person")
+  age: int = Field (description = "Age of the Person")
+  height: Optional [str] = Field (description = "Height of the Person")
+
+class People (BaseModel) :
+
+  people: List [Person]
+  
+  Person.schema()
+
+structured_llama3 = llama3.with_structured_output (Person)
+structured_llama3.invoke("Ilya is 43 years of age and 5 feet 11")
+
+from langchain_core.prompts import PromptTemplate
+
+from langchain_core.output_parsers import SimpleJsonOutputParser, JsonOutputParser
+
+prompt = PromptTemplate.from_template ("""
+                                       You are an expert data parser, parse data from user query. Use this schema:
+                                       {schema}
+                                       Respond only as JSON based on above-mentioned schema. Strictly follow JSON Schema and do not add any extra fields. 
+                                       If you do not know any field, then set it to None.
+                                       {query}
+                                       """)
+
+llm = prompt | llama3 |SimpleJsonOutputParser()
+result = llm.invoke({
+    "schema": Person.schema(),                    
+    "query": "Ilya is 43 years old, and 189 lbs heavy. He likes ice cream"
+})
+print(result)
+  People.schema()
+llm = prompt | llama3 | People.schema_json()
+
+llm.invoke("schema" : Person.schema(), "query":"Ilya is 43 years old and he is 5-11 tall").
+
+ai_msg = (prompt | llama3).invoke
+
+
+
+                            
