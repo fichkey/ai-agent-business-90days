@@ -1,3 +1,4 @@
+# https://www.youtube.com/watch?v=qW6liOeb340
 !pip install langchain_openai
 
 from langchain_openai import ChatOpenAI
